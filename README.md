@@ -1,8 +1,8 @@
 # solarforecast
 
 ### Notes:
-**Created on 7/19/2016**
-**Complete Revision: 8/11/2016**
+-**Created on 7/19/2016**
+-**Complete Revision: 8/11/2016**
 
 This briefly documents some of the processes included in this folder.
 
