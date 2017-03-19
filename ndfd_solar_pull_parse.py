@@ -1,4 +1,5 @@
-#!/home/bglr02/anaconda3/bin/python3
+#!/usr/bin/python3
+#The default location will need to change depending on your personal installation
 
 import time
 import dateutil.parser
@@ -14,9 +15,8 @@ import shlex
 import os 
 import pandas as pd
 
-#filenames=['/metero/morningscripts/solar/SPS_solar.txt','/metero/morningscripts/solar/SCO_solar.txt']
-#filenames=['/metero/morningscripts/solar/PSCO_solar.txt']
-mainPath = '/metero/morningscripts/solar/'
+#mainPath = 'solar/'
+mainPath = ''
 
 '''
 function utc_to_local
@@ -37,24 +37,14 @@ This function needed to go through a proxy firewall to pull the data from
 weather.noaa.gov and pull the cloud cover data from the models
 '''   
 def solarPull():
-    proxydata = open('/metero/morningscripts/proxyfile', 'r')
-    ct=0
-    for i in proxydata:
-        i=i.replace('\n','')
-        if ct==0:
-            xceluser=i
-        if ct==1:
-            xcelpw=i
-        ct+=1
-    proxyurl = 'http://'+xceluser+':'+xcelpw+'@wproxy.corp.xcelenergy.com:8080'
-    proxy = urllib.request.ProxyHandler({'http': proxyurl})
-    opener = urllib.request.build_opener(proxy, urllib.request.HTTPHandler)
-    urllib.request.install_opener(opener)
-    urlList=['http://weather.noaa.gov/pub/SL.us008001/ST.opnl/DF.gr2/DC.ndfd/AR.conus/VP.001-003/',
-             'http://weather.noaa.gov/pub/SL.us008001/ST.opnl/DF.gr2/DC.ndfd/AR.conus/VP.004-007/']
+    #opener = urllib.request.build_opener(proxy, urllib.request.HTTPHandler)
+    #opener = urllib.request.build_opener(urllib.request.HTTPHandler)
+    #urllib.request.install_opener(opener)
+    urlList=['http://tgftp.nws.noaa.gov/SL.us008001/ST.opnl/DF.gr2/DC.ndfd/AR.conus/VP.001-003/',
+            'http://tgftp.nws.noaa.gov/SL.us008001/ST.opnl/DF.gr2/DC.ndfd/AR.conus/VP.004-007/']
 
-    #attempted to use smaller files by region, but the files don't appear to contain the same amount of data
-    #maybe something to dig into later
+    #attempted to use smaller files by region, but the files don't appear to contain the 
+    #same amount of data...maybe something to dig into later
     #urlList=[
     #         'http://weather.noaa.gov/pub/SL.us008001/ST.opnl/DF.gr2/DC.ndfd/AR.splains/VP.001-003/',
     #         'http://weather.noaa.gov/pub/SL.us008001/ST.opnl/DF.gr2/DC.ndfd/AR.splains/VP.004-007/',
@@ -65,12 +55,11 @@ def solarPull():
     #        ]
     ct=0
     file='ds.sky.bin'
-    
     #opcoList=['SPS','SPS','PSCO','PSCO','NSP','NSP']
     for url in urlList:
         wUrl=url+file
         req = urllib.request.urlopen(wUrl)
-    #    filename=mainPath+'ds.sky.'+opcoList[ct]+'.'+str(ct)+'.bin'
+        #filename=mainPath+'ds.sky.'+opcoList[ct]+'.'+str(ct)+'.bin'
         filename=mainPath+'ds.sky.'+str(ct)+'.bin'
         ct+=1
         with open(filename, 'wb') as fp:
@@ -82,7 +71,7 @@ function solarParser
 def solarParser(opName,sPlant,lon,lat,sCount):
     wgribString = 'wgrib2 '+mainPath+'ds.sky.0.bin -vt -lon '+lon+' '+lat 
     wgribString2 = 'wgrib2 '+mainPath+'ds.sky.1.bin -vt -lon '+lon+' '+lat 
-    #subprocess.call(shlex.split('wgrib2 /metero/morningscripts/solar/ds.sky1.bin -vt -lon -105.88 37.77 -csv junk' ))
+    #subprocess.call(shlex.split('wgrib2 ds.sky1.bin -vt -lon -105.88 37.77 -csv junk' ))
     #subprocess.call(shlex.split(wgribString))
     #subprocess.call(shlex.split(wgribString2))
     with open(mainPath+opName+'_solar.txt', "w") as outfile:
@@ -212,8 +201,8 @@ def solarMaxGen(sOpCo,sPlant):
     solar2DF = pd.concat([solarDF, finalDF], axis = 0)
     solar2DF = pd.concat([solar2DF, solarmaxDF], axis = 0)
     #print(solar2DF)
-    #solarDF.to_csv('/metero/morningscripts/solar/OuputFiles/'+sOpCo+'_'+sPlant+'_solar.csv' )
-    solar2DF.to_csv('/metero/morningscripts/solar/OutputFiles/'+sOpCo+'_'+sPlant+'_final_solar.csv',header=None)
+    #solarDF.to_csv('OuputFiles/'+sOpCo+'_'+sPlant+'_solar.csv' )
+    solar2DF.to_csv('OutputFiles/'+sOpCo+'_'+sPlant+'_final_solar.csv',header=None)
     
      
     #print(solarDF) 
@@ -259,6 +248,6 @@ with open('solarMeta.csv') as region:
         #look into df.loc to determine if you can create the sum of every nth column starting at row 1
         regionalsolar = regionalsolar.reset_index(drop=True)
         regionalsolar = pd.concat([regionalsolar,solarsum],axis=1)
-        regionalsolar.to_csv('/metero/morningscripts/solar/OutputFiles/'+OpRegion+'_final_solar.csv')
+        regionalsolar.to_csv('OutputFiles/'+OpRegion+'_final_solar.csv')
         listCt+=1
     
