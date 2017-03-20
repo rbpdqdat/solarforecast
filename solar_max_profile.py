@@ -1,4 +1,4 @@
-#!/home/bglr02/anaconda3/bin/python3
+#!/usr/bin/python3
 
 import time
 import dateutil.parser
@@ -6,7 +6,7 @@ import datetime
 from datetime import timedelta
 import pandas as pd 
 
-mainPath='/metero/morningscripts/solar/'
+mainPath=''
 
 #This is a nested list in order of the associated ndfd sky cover file
 solarfiles=[['Alamosa.csv']]
